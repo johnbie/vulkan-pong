@@ -156,6 +156,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PongApplication_Helper.cpp" />
+    <ClCompile Include="PongApplication_Public.cpp" />
+    <ClCompile Include="PongApplication_Private.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="PongApplication.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,1 +1,5 @@
-﻿  VulkanPong.vcxproj -> C:\Users\John Lee\Documents\GitHub\vulkan-pong\VulkanPong\x64\Debug\VulkanPong.exe
+﻿  PongApplication_Helper.cpp
+  PongApplication_Public.cpp
+  PongApplication_Private.cpp
+  Generating Code...
+  VulkanPong.vcxproj -> C:\Users\John Lee\Documents\GitHub\vulkan-pong\VulkanPong\x64\Debug\VulkanPong.exe

@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+VulkanPong/.vs/VulkanPong/v16/Browse.VC.opendb
+VulkanPong/.vs/VulkanPong/v16/Browse.VC.db-wal
+VulkanPong/.vs/VulkanPong/v16/Browse.VC.db-shm
+VulkanPong/.vs/VulkanPong/v16/Browse.VC.db
+VulkanPong/.vs/VulkanPong/v16/.suo
