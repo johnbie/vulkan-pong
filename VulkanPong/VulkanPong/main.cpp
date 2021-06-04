@@ -1,11 +1,16 @@
 #include "PongApplication.h"
 
-// nothing here except the code runner
+#include <iostream>
+
+const uint32_t WIDTH = 800;
+const uint32_t HEIGHT = 600;
+
+// code runner
 int main() {
-    PongApplication app;
+    PongApplication app(WIDTH, HEIGHT);
 
     try {
-        app.run();
+        app.Run();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

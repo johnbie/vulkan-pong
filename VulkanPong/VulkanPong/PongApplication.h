@@ -1,15 +1,22 @@
-#pragma once
-#include <vulkan/vulkan.h>
+#include "AppObject.h"
+#include "VulkanEngine.h"
 
-#include <iostream>
-#include <stdexcept>
-#include <cstdlib>
+// #include "pch.h"
 
-class PongApplication {
+// c++ libraries
+#include <vector>
+
+class PongApplication : public AppObject
+{
 public:
-    void run();
+    PongApplication(uint32_t width, uint32_t height, bool initialize = false);
+    void Run();
+protected:
+    virtual void initialize();
+    virtual void update();
+    virtual void clean();
 private:
-    void initVulkan();
-    void mainLoop();
-    void cleanup();
+    const uint32_t WIDTH, HEIGHT;
+    GLFWwindow* window; // glfw window instance
+    VulkanEngine* vulkanEngine; // glfw window instance
 };

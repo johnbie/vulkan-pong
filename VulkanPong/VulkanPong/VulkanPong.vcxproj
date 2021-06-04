@@ -155,13 +155,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppObject.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="PongApplication_Helper.cpp" />
-    <ClCompile Include="PongApplication_Public.cpp" />
-    <ClCompile Include="PongApplication_Private.cpp" />
+    <ClCompile Include="PongApplication.cpp" />
+    <ClCompile Include="VulkanEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Debug.h" />
+    <ClInclude Include="AppObject.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="PongApplication.h" />
+    <ClInclude Include="Vertex.h" />
+    <ClInclude Include="VulkanEngine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

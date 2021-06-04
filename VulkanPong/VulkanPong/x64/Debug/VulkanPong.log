@@ -1,5 +1,7 @@
-﻿  PongApplication_Helper.cpp
-  PongApplication_Public.cpp
-  PongApplication_Private.cpp
+﻿  AppObject.cpp
+  main.cpp
+  PongApplication.cpp
+  VulkanEngine.cpp
   Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
   VulkanPong.vcxproj -> C:\Users\John Lee\Documents\GitHub\vulkan-pong\VulkanPong\x64\Debug\VulkanPong.exe
