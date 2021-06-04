@@ -189,7 +189,8 @@ void VulkanEngine::createSurface()
 }
 
 // for picking a gpu
-void VulkanEngine::pickPhysicalDevice() {
+void VulkanEngine::pickPhysicalDevice()
+{
     // get number of gpu available
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
@@ -272,8 +273,87 @@ void VulkanEngine::createLogicalDevice()
     vkGetDeviceQueue(logicalDevice, indices.presentFamily.value(), 0, &presentationQueue);
 }
 
-void VulkanEngine::createSwapChain() {} // for swap chains, which allow frame-by-frame rendering via image queuing
-void VulkanEngine::createImageViews() {} // for creating an image view, which specifies what part of the image should be accessed in what way
+// for creating swap chains, which allow frame-by-frame rendering via image queuing
+void VulkanEngine::createSwapChain()
+{
+    // check for swap chain support
+    SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice);
+
+    VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats); // surface formats aka color depth
+    VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes); // presentation mode aka the conditions
+    VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities); // extent aka resolution of images
+
+    // minimum image count to go for in a swap chain
+    uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
+
+    // maximum image count to avoid exceeding. if it's zero, there's no limit.
+    if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
+        imageCount = swapChainSupport.capabilities.maxImageCount;
+    }
+
+    // fill in swap chain creation info
+    VkSwapchainCreateInfoKHR createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    createInfo.surface = surface;
+
+    createInfo.minImageCount = imageCount;
+    createInfo.imageFormat = surfaceFormat.format;
+    createInfo.imageColorSpace = surfaceFormat.colorSpace;
+    createInfo.imageExtent = extent;
+    createInfo.imageArrayLayers = 1; // one layer per image; doesn't change unless doing complex like a stereoscopic 3D application
+    createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    // get queue families for swap chaining
+    QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
+    uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+    // are the two families different?
+    if (indices.graphicsFamily != indices.presentFamily) {
+        createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT; // share
+        createInfo.queueFamilyIndexCount = 2;
+        createInfo.pQueueFamilyIndices = queueFamilyIndices;
+    }
+    else {
+        createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE; // greed
+        // createInfo.queueFamilyIndexCount = 0; // optional; explicit
+        // createInfo.pQueueFamilyIndices = nullptr; // optional; explicit
+    }
+
+    createInfo.preTransform = swapChainSupport.capabilities.currentTransform; // don't do flips, 180s, or any of that crazy shit
+    createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR; // no transparency needed
+    createInfo.presentMode = presentMode;
+    createInfo.clipped = VK_TRUE; // you can ignore pixels that the user can't see
+
+    createInfo.oldSwapchain = VK_NULL_HANDLE; // more on this later, but is related to window resizing and other forms of swap chain invalidation
+
+    // create the swap chain
+    if (vkCreateSwapchainKHR(logicalDevice, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create swap chain!");
+    }
+
+    // set up images
+    vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, nullptr);
+    swapChainImages.resize(imageCount);
+    vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, swapChainImages.data());
+
+    // set image format and extent aka resolution
+    swapChainImageFormat = surfaceFormat.format;
+    swapChainExtent = extent;
+}
+
+// for creating image view, which specifies what part of the image should be accessed in what way
+void VulkanEngine::createImageViews()
+{
+    // image view vector should be resized to match the swapchain image vector size
+    swapChainImageViews.resize(swapChainImages.size());
+
+    // iterate over swap chain images
+    for (size_t i = 0; i < swapChainImages.size(); i++)
+    {
+        swapChainImageViews[i] = CreateImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT, 1); // create image views
+    }
+}
+
 void VulkanEngine::createRenderPass() {} // for creating a render pass, which contains various render information to apply
 void VulkanEngine::createDescriptorSetLayout() {} // for creating the descriptor for the vertex shader
 void VulkanEngine::createGraphicsPipeline() {} // for setting up graphics pipeline, which is turns a coordinate of positions & colors into a collection of colored pixels
@@ -382,5 +462,26 @@ QueueFamilyIndices VulkanEngine::FindQueueFamilies(VkPhysicalDevice device)
     return indices;
 }
 
+// for creating an image view
+VkImageView VulkanEngine::CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels)
+{
+    // set up image view creation info
+    VkImageViewCreateInfo viewInfo{};
+    viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+    viewInfo.image = image;
+    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.format = format;
+    viewInfo.subresourceRange.aspectMask = aspectFlags;
+    viewInfo.subresourceRange.baseMipLevel = 0;
+    viewInfo.subresourceRange.levelCount = mipLevels;
+    viewInfo.subresourceRange.baseArrayLayer = 0;
+    viewInfo.subresourceRange.layerCount = 1;
+
+    VkImageView imageView;
+    if (vkCreateImageView(logicalDevice, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
+        throw std::runtime_error("failed to create image view!");
+
+    return imageView;
+}
 
 void VulkanEngine::cleanSwapchain() {} // clean swapchain
