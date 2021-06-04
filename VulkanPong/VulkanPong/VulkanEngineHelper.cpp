@@ -3,6 +3,8 @@
 #include "DebugHelper.h"
 
 #include <set>
+#include <iostream>
+#include <fstream>
 
 const std::vector<const char*> VulkanEngineHelper::validationLayers = {
     "VK_LAYER_KHRONOS_validation", // useful standard validations
@@ -138,4 +140,29 @@ VkExtent2D VulkanEngineHelper::ChooseSwapExtent(GLFWwindow* window, const VkSurf
 
         return actualExtent;
     }
+}
+
+
+
+// file reader function
+std::vector<char> VulkanEngineHelper::ReadFile(const std::string& filename)
+{
+    // get input filestream from end of line (ate) as binary
+    std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+    // failed to open file
+    if (!file.is_open())
+        throw std::runtime_error("failed to open file!");
+
+    // use filesize to create buffer, from which you fill out the binary data
+    size_t fileSize = (size_t)file.tellg();
+    std::vector<char> buffer(fileSize);
+
+    // go back to beginning of file and fill out the byte vector
+    file.seekg(0);
+    file.read(buffer.data(), fileSize);
+
+    // close file and return buffer
+    file.close();
+    return buffer;
 }

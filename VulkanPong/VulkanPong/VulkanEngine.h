@@ -37,7 +37,6 @@ private:
     std::vector<VkFramebuffer> swapChainFramebuffers; // the swap chain frame buffer, which is what you need to actually render something on the screen
 
     VkRenderPass renderPass; // render pass, which contains various render information to apply
-    VkDescriptorSetLayout descriptorSetLayout; // descriptor layout
     VkPipelineLayout pipelineLayout; // graphic pipeline layout, which is needed for graphic pipeline stuff
     VkPipeline graphicsPipeline; // graphic pipleine (the real thing)
 
@@ -72,7 +71,6 @@ private:
     void createSwapChain(); // for swap chains, which allow frame-by-frame rendering via image queuing
     void createImageViews(); // for creating an image view, which specifies what part of the image should be accessed in what way
     void createRenderPass(); // for creating a render pass, which contains various render information to apply
-    void createDescriptorSetLayout(); // for creating the descriptor for the vertex shader
     void createGraphicsPipeline(); // for setting up graphics pipeline, which is turns a coordinate of positions & colors into a collection of colored pixels
     void createColorResources(); // for setting up color resources, which is needed for multisampling
     void createDepthResources(); // for setting up the depth resources, which is what renders the right image on top of the other
@@ -93,4 +91,5 @@ private:
     SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
+    VkShaderModule createShaderModule(const std::vector<char>& code);
 };
