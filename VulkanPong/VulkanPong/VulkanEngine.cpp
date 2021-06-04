@@ -279,9 +279,9 @@ void VulkanEngine::createSwapChain()
     // check for swap chain support
     SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(physicalDevice);
 
-    VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats); // surface formats aka color depth
-    VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes); // presentation mode aka the conditions
-    VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities); // extent aka resolution of images
+    VkSurfaceFormatKHR surfaceFormat = VulkanEngineHelper::ChooseSwapSurfaceFormat(swapChainSupport.formats); // surface formats aka color depth
+    VkPresentModeKHR presentMode = VulkanEngineHelper::ChooseSwapPresentMode(swapChainSupport.presentModes); // presentation mode aka the conditions
+    VkExtent2D extent = VulkanEngineHelper::ChooseSwapExtent(window, swapChainSupport.capabilities); // extent aka resolution of images
 
     // minimum image count to go for in a swap chain
     uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;

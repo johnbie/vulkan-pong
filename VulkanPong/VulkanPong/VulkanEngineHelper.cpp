@@ -85,3 +85,58 @@ bool VulkanEngineHelper::DeviceExtensionsAreSupported(VkPhysicalDevice device)
     // were all the required extensions accounted for? or were there any that weren't removed?
     return requiredExtensions.empty();
 }
+
+
+// chooses the best available surface format to do swap chains with
+// checks based on surface format (aka color depth), presentation mode (the conditions), and swap extent (resolution of images)
+VkSurfaceFormatKHR VulkanEngineHelper::ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+{
+    // checks for format that supports what is most ideal
+    for (const auto& availableFormat : availableFormats) {
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            return availableFormat;
+    }
+
+    // returns the first available format
+    return availableFormats[0];
+}
+
+// choose the presentation mode aka the actual conditions of showing an image
+VkPresentModeKHR VulkanEngineHelper::ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes)
+{
+    // triple-buffering mode if available; avoids tearing
+    for (const auto& availablePresentMode : availablePresentModes)
+    {
+        if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) 
+            return availablePresentMode;
+    }
+
+    // queue (aka first-in-first-out) mode; avoids tearing
+    return VK_PRESENT_MODE_FIFO_KHR;
+}
+
+// choose the actual extent aka the actual resolution
+VkExtent2D VulkanEngineHelper::ChooseSwapExtent(GLFWwindow* window, const VkSurfaceCapabilitiesKHR& capabilities)
+{
+    // if there's already a resolution set...
+    if (capabilities.currentExtent.width != UINT32_MAX) 
+        return capabilities.currentExtent; // return it
+    else 
+    {
+        // get size based on glfw's discretion
+        int width, height;
+        glfwGetFramebufferSize(window, &width, &height);
+
+        VkExtent2D actualExtent = 
+        {
+            static_cast<uint32_t>(width),
+            static_cast<uint32_t>(height)
+        };
+
+        // max of two minimums
+        actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
+        actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
+
+        return actualExtent;
+    }
+}

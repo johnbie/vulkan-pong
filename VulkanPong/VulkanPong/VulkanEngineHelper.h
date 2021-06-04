@@ -14,4 +14,8 @@ public:
     static std::vector<const char*> RequiredExtensions();
     static bool ValidationLayersAreSupported();
     static bool DeviceExtensionsAreSupported(VkPhysicalDevice device);
+
+    static VkSurfaceFormatKHR ChooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+    static VkPresentModeKHR ChooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+    static VkExtent2D ChooseSwapExtent(GLFWwindow* window, const VkSurfaceCapabilitiesKHR& capabilities);
 };
