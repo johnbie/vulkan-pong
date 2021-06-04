@@ -30,6 +30,12 @@
 *.exe
 *.out
 *.app
+/VulkanPong/.vs
 */VulkanPong/.vs
+/VulkanPong/x64
+*/VulkanPong/x64
+*/VulkanPong/Debug
+/VulkanPong/VulkanPong/x64
 */VulkanPong/VulkanPong/x64
+/VulkanPong/VulkanPong/Debug
 */VulkanPong/VulkanPong/Debug
