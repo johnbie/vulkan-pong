@@ -22,9 +22,7 @@ std::vector<const char*> VulkanEngineHelper::RequiredExtensions()
     std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
     if (DebugHelper::ENABLE_VALIDATION_LAYERS)
-    {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME); // extension only needed in debug mode
-    }
 
     return extensions;
 }
@@ -45,17 +43,18 @@ bool VulkanEngineHelper::ValidationLayersAreSupported()
         bool layerFound = false;
 
         // look for the requested layer
-        for (const auto& layerProperties : availableLayers) {
-            if (strcmp(layerName, layerProperties.layerName) == 0) {
+        for (const auto& layerProperties : availableLayers)
+        {
+            if (strcmp(layerName, layerProperties.layerName) == 0)
+            {
                 layerFound = true;
                 break;
             }
         }
 
         // requested layer not found
-        if (!layerFound) {
+        if (!layerFound)
             return false;
-        }
     }
 
     // all requested layers found
