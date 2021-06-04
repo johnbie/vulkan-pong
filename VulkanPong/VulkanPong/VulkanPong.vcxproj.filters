@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Structs">
+      <UniqueIdentifier>{02a8c7c3-6cac-43c0-a8a5-cabf469b0d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AppObjects">
+      <UniqueIdentifier>{89454ad8-1ed3-43dd-a513-9d0454e22f3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Helpers">
+      <UniqueIdentifier>{f6d1ed2c-e1e6-4917-a8b4-d176060404fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,31 +36,37 @@
     <ClCompile Include="AppObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VulkanEngineHelper.h">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="VulkanEngineHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="QueueFamilyIndices.h">
+      <Filter>Header Files\Structs</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanEngineHelper.h">
+      <Filter>Header Files\Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PongApplication.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Vertex.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VulkanEngine.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Vertex.h">
+      <Filter>Header Files\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChainSupportDetails.h">
+      <Filter>Header Files\Structs</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugHelper.h">
+      <Filter>Header Files\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="AppObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\AppObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="PongApplication.h">
+      <Filter>Header Files\AppObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanEngine.h">
+      <Filter>Header Files\AppObjects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -6,7 +6,8 @@
 
 #include <array>
 
-struct Vertex {
+struct Vertex
+{
     glm::vec2 pos; // absolute 2d position
     glm::vec3 color; // absolute rgb color
 

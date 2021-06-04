@@ -158,15 +158,17 @@
     <ClCompile Include="AppObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PongApplication.cpp" />
+    <ClCompile Include="QueueFamilyIndices.h" />
     <ClCompile Include="VulkanEngine.cpp" />
     <ClCompile Include="VulkanEngineHelper.cpp" />
     <ClCompile Include="VulkanEngineHelper.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Debug.h" />
+    <ClInclude Include="DebugHelper.h" />
     <ClInclude Include="AppObject.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PongApplication.h" />
+    <ClInclude Include="SwapChainSupportDetails.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanEngine.h" />
   </ItemGroup>

@@ -4,7 +4,7 @@
 
 #pragma warning(disable : 26812)
 
-class Debug {
+class DebugHelper {
 public:
 #ifdef NDEBUG
     static const bool ENABLE_VALIDATION_LAYERS = false;
@@ -41,6 +41,7 @@ public:
             func(instance, debugMessenger, pAllocator);
         }
     }
+
 private:
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) 
     {

@@ -2,6 +2,8 @@
 #include "AppObject.h"
 #include "Vertex.h"
 #include "pch.h"
+#include "QueueFamilyIndices.h"
+#include "SwapChainSupportDetails.h"
 
 #include <vector>
 
@@ -87,5 +89,7 @@ private:
     void cleanSwapchain(); // clean swapchain
 
     // helper functions
-    bool checkValidationLayerSupport(); // used with createInstance()
+    bool DeviceIsSuitable(VkPhysicalDevice device);
+    SwapChainSupportDetails QuerySwapChainSupport(VkPhysicalDevice device);
+    QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
 };

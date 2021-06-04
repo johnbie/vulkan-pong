@@ -1,7 +1,7 @@
 #pragma once
 #include "VulkanEngine.h"
 #include "VulkanEngineHelper.h"
-#include "Debug.h"
+#include "DebugHelper.h"
 
 // c++ libraries
 #include <iostream>
@@ -15,7 +15,7 @@
 //#include <cstdint>
 //#include <array>
 //#include <optional>
-//#include <set>
+#include <set>
 //#include <unordered_map>
 
 VulkanEngine::VulkanEngine(GLFWwindow* window, bool initialize)
@@ -108,8 +108,8 @@ void VulkanEngine::clean()
     vkDestroyDevice(logicalDevice, nullptr); // delete logical device
 
     // if validation layer was on...
-    if (Debug::ENABLE_VALIDATION_LAYERS)
-        Debug::DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr); // delete debug utils
+    if (DebugHelper::ENABLE_VALIDATION_LAYERS)
+        DebugHelper::DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr); // delete debug utils
 
     vkDestroySurfaceKHR(instance, surface, nullptr); // delete surface instance, which is device-specific
     vkDestroyInstance(instance, nullptr); // delete instance
@@ -119,7 +119,7 @@ void VulkanEngine::clean()
 void VulkanEngine::createInstance()
 {
     // if validation layer is on but not all the requested layers are available
-    if (Debug::ENABLE_VALIDATION_LAYERS && !VulkanEngineHelper::checkValidationLayerSupport())
+    if (DebugHelper::ENABLE_VALIDATION_LAYERS && !VulkanEngineHelper::ValidationLayersAreSupported())
     {
         throw std::runtime_error("validation layers requested, but not available!");
     }
@@ -140,17 +140,17 @@ void VulkanEngine::createInstance()
 
     // get required extensions
     // extensions are the tools available for use on the device
-    auto extensions = VulkanEngineHelper::getRequiredExtensions();
+    auto extensions = VulkanEngineHelper::RequiredExtensions();
     createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
     createInfo.ppEnabledExtensionNames = extensions.data();
 
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
-    if (Debug::ENABLE_VALIDATION_LAYERS)
+    if (DebugHelper::ENABLE_VALIDATION_LAYERS)
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(VulkanEngineHelper::validationLayers.size());
         createInfo.ppEnabledLayerNames = VulkanEngineHelper::validationLayers.data();
 
-        Debug::PopulateDebugMessengerCreateInfo(debugCreateInfo);
+        DebugHelper::PopulateDebugMessengerCreateInfo(debugCreateInfo);
         createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
     }
     else
@@ -169,14 +169,14 @@ void VulkanEngine::createInstance()
 // setup debugger instance
 void VulkanEngine::setupDebugMessenger()
 {
-    if (!Debug::ENABLE_VALIDATION_LAYERS) return;
+    if (!DebugHelper::ENABLE_VALIDATION_LAYERS) return;
 
     // setup code
     VkDebugUtilsMessengerCreateInfoEXT createInfo;
-    Debug::PopulateDebugMessengerCreateInfo(createInfo); // populate data
+    DebugHelper::PopulateDebugMessengerCreateInfo(createInfo); // populate data
 
     // if failed
-    if (Debug::CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
+    if (DebugHelper::CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
         throw std::runtime_error("failed to set up debug messenger!");
 }
 
@@ -188,8 +188,90 @@ void VulkanEngine::createSurface()
         throw std::runtime_error("failed to create surface for window!");
 }
 
-void VulkanEngine::pickPhysicalDevice() {} // for looking for graphics card in system
-void VulkanEngine::createLogicalDevice() {} // for logical device, which is needed for figuring out what device should be used for our application
+// for picking a gpu
+void VulkanEngine::pickPhysicalDevice() {
+    // get number of gpu available
+    uint32_t deviceCount = 0;
+    vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+
+    // none found
+    if (deviceCount == 0) {
+        throw std::runtime_error("failed to find GPUs with Vulkan support!");
+    }
+
+    // list devices
+    std::vector<VkPhysicalDevice> devices(deviceCount);
+    vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+
+    // look for the first suitable gpu
+    // if you want to find the best suitable gpu, it's available on the physical devices tutorial: https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Physical_devices_and_queue_families#page_Base-device-suitability-checks
+    for (const auto& device : devices)
+    {
+        if (DeviceIsSuitable(device))
+        {
+            physicalDevice = device;
+            break;
+        }
+    }
+
+    // no suitable gpu found
+    if (physicalDevice == VK_NULL_HANDLE) {
+        throw std::runtime_error("failed to find a suitable GPU!");
+    }
+}
+
+// create logical device
+void VulkanEngine::createLogicalDevice()
+{
+    // look for queues with graphic capabilities
+    QueueFamilyIndices indices = FindQueueFamilies(physicalDevice);
+
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+
+    // set queue priority; needed even if there's only one queue
+    float queuePriority = 1.0f;
+    for (uint32_t queueFamily : uniqueQueueFamilies)
+    {
+        VkDeviceQueueCreateInfo queueCreateInfo{};
+        queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+        queueCreateInfo.queueFamilyIndex = queueFamily;
+        queueCreateInfo.queueCount = 1;
+        queueCreateInfo.pQueuePriorities = &queuePriority;
+        queueCreateInfos.push_back(queueCreateInfo);
+    }
+
+    // set up device features config
+    VkPhysicalDeviceFeatures deviceFeatures{};
+    deviceFeatures.samplerAnisotropy = VK_TRUE; // request anisotropy sampler feature
+
+    // create a logical device
+    VkDeviceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
+    createInfo.pEnabledFeatures = &deviceFeatures;
+
+    // device extensions
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(VulkanEngineHelper::deviceExtensions.size());
+    createInfo.ppEnabledExtensionNames = VulkanEngineHelper::deviceExtensions.data();
+
+    if (DebugHelper::ENABLE_VALIDATION_LAYERS)
+    {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(VulkanEngineHelper::validationLayers.size());
+        createInfo.ppEnabledLayerNames = VulkanEngineHelper::validationLayers.data();
+    }
+    else
+        createInfo.enabledLayerCount = 0;
+
+    // error check
+    if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &logicalDevice) != VK_SUCCESS)
+        throw std::runtime_error("failed to create logical device!");
+
+    vkGetDeviceQueue(logicalDevice, indices.graphicsFamily.value(), 0, &graphicsQueue);
+    vkGetDeviceQueue(logicalDevice, indices.presentFamily.value(), 0, &presentationQueue);
+}
+
 void VulkanEngine::createSwapChain() {} // for swap chains, which allow frame-by-frame rendering via image queuing
 void VulkanEngine::createImageViews() {} // for creating an image view, which specifies what part of the image should be accessed in what way
 void VulkanEngine::createRenderPass() {} // for creating a render pass, which contains various render information to apply
@@ -207,4 +289,98 @@ void VulkanEngine::createDescriptorPool() {} // for setting up the descriptor po
 void VulkanEngine::createDescriptorSets() {} // for setting up the descriptor sets, which does stuff
 void VulkanEngine::createCommandBuffers() {} // for setting up the command buffer, which is the collection of commands
 void VulkanEngine::createSyncObjects() {} // for setting up the various sync objects, which are needed for real-time drawing
+
+
+// checks if device is suitable for what we want to do
+// this includes supporting swapchains
+bool VulkanEngine::DeviceIsSuitable(VkPhysicalDevice device)
+{
+    QueueFamilyIndices indices = FindQueueFamilies(device);
+
+    // does the specific device support all the extensions we need?
+    bool extensionsSupported = VulkanEngineHelper::DeviceExtensionsAreSupported(device);
+
+    // does the device have adquate swap chain support? (supporting it isn't enough)
+    bool swapChainAdequate = false;
+    if (extensionsSupported) {
+        SwapChainSupportDetails swapChainSupport = QuerySwapChainSupport(device);
+        swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+    }
+
+    // are all the requested physical device features supported?
+    VkPhysicalDeviceFeatures supportedFeatures;
+    vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
+
+    // yes/no
+    return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
+}
+
+SwapChainSupportDetails VulkanEngine::QuerySwapChainSupport(VkPhysicalDevice device)
+{
+    SwapChainSupportDetails details;
+
+    // check for basic surface capacities
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+
+    // get the count of supported surface capacities
+    uint32_t formatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+
+    // nonzero supported formats
+    if (formatCount != 0) {
+        // update size and add the other data
+        details.formats.resize(formatCount);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
+    }
+
+    // get the count of supported presentation modes
+    uint32_t presentModeCount;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+
+    // nonzero supported formats
+    if (presentModeCount != 0) {
+        // update size and add the other data
+        details.presentModes.resize(presentModeCount);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+    }
+
+    return details;
+}
+
+// find queue families, which does something
+QueueFamilyIndices VulkanEngine::FindQueueFamilies(VkPhysicalDevice device)
+{
+    QueueFamilyIndices indices;
+
+    // get list of queue families
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+    std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+    // finds at least one queue family
+    int i = 0;
+    for (const auto& queueFamily : queueFamilies) {
+        if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            indices.graphicsFamily = i;
+
+            // present support
+            VkBool32 presentSupport = false;
+            vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+            if (presentSupport) {
+                indices.presentFamily = i;
+            }
+        }
+
+        if (indices.isComplete()) {
+            break;
+        }
+        i++;
+    }
+
+    return indices;
+}
+
+
 void VulkanEngine::cleanSwapchain() {} // clean swapchain
