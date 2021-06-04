@@ -61,8 +61,6 @@ void VulkanEngine::initialize()
     createImageViews(); // for creating an image view, which specifies what part of the image should be accessed in what way
     createRenderPass(); // for creating a render pass, which contains various render information to apply
     createGraphicsPipeline(); // for setting up graphics pipeline, which is turns a coordinate of positions & colors into a collection of colored pixels
-    createColorResources(); // for setting up color resources, which is needed for multisampling
-    createDepthResources(); // for setting up the depth resources, which is what renders the right image on top of the other
     createFramebuffers(); // for setting up the swap chain frame buffer, which is what you need to actually render something on the screen
     createCommandPool(); // for setting up the command pool, which is what sends the draw commands to vulkan
     createVertexBuffer(); // for setting up the vertex buffers, which is what's needed to render vert
@@ -496,9 +494,36 @@ void VulkanEngine::createGraphicsPipeline() {
     vkDestroyShaderModule(logicalDevice, vertShaderModule, nullptr);
 }
 
-void VulkanEngine::createColorResources() {} // for setting up color resources, which is needed for multisampling
-void VulkanEngine::createDepthResources() {} // for setting up the depth resources, which is what renders the right image on top of the other
-void VulkanEngine::createFramebuffers() {} // for setting up the swap chain frame buffer, which is what you need to actually render something on the screen
+// for creating swap chain frame buffers, which is what you need to actually render something on the screen 
+void VulkanEngine::createFramebuffers()
+{
+    // resize swap chain framebuffer vector
+    swapChainFramebuffers.resize(swapChainImageViews.size()); 
+
+    // iterate over swap chain image views
+    for (size_t i = 0; i < swapChainImageViews.size(); i++)
+    {
+        // get attachments from image views
+        VkImageView attachments[] = {
+            swapChainImageViews[i]
+        };
+
+        // set up frame buffer creation info
+        VkFramebufferCreateInfo framebufferInfo{};
+        framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferInfo.renderPass = renderPass;
+        framebufferInfo.attachmentCount = 1;
+        framebufferInfo.pAttachments = attachments;
+        framebufferInfo.width = swapChainExtent.width;
+        framebufferInfo.height = swapChainExtent.height;
+        framebufferInfo.layers = 1;
+
+        // create and add frame buffers
+        if (vkCreateFramebuffer(logicalDevice, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) 
+            throw std::runtime_error("failed to create framebuffer!");
+    }
+}
+
 void VulkanEngine::createCommandPool() {} // for setting up the command pool, which is what sends the draw commands to vulkan
 
 void VulkanEngine::createVertexBuffer() {} // for setting up the vertex buffers, which is what's needed to render vert

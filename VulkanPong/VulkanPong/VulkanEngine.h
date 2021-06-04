@@ -72,8 +72,6 @@ private:
     void createImageViews(); // for creating an image view, which specifies what part of the image should be accessed in what way
     void createRenderPass(); // for creating a render pass, which contains various render information to apply
     void createGraphicsPipeline(); // for setting up graphics pipeline, which is turns a coordinate of positions & colors into a collection of colored pixels
-    void createColorResources(); // for setting up color resources, which is needed for multisampling
-    void createDepthResources(); // for setting up the depth resources, which is what renders the right image on top of the other
     void createFramebuffers(); // for setting up the swap chain frame buffer, which is what you need to actually render something on the screen
     void createCommandPool(); // for setting up the command pool, which is what sends the draw commands to vulkan
 
