@@ -65,7 +65,6 @@ void VulkanEngine::initialize()
     createCommandPool(); // for setting up the command pool, which is what sends the draw commands to vulkan
     createVertexBuffer(); // for setting up the vertex buffers, which is what's needed to render vert
     createIndexBuffer(); // for setting up the index buffers, which prevents vertex duplication inefficiency
-    createUniformBuffers(); // for setting up the uniform buffer, which is needed for sampling later
     createDescriptorPool(); // for setting up the descriptor pool, which does stuff
     createDescriptorSets(); // for setting up the descriptor sets, which does stuff
     createCommandBuffers(); // for setting up the command buffer, which is the collection of commands
@@ -405,8 +404,14 @@ void VulkanEngine::createGraphicsPipeline() {
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
+
+    auto bindingDescription = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -524,11 +529,70 @@ void VulkanEngine::createFramebuffers()
     }
 }
 
-void VulkanEngine::createCommandPool() {} // for setting up the command pool, which is what sends the draw commands to vulkan
+// for creating the command pool, which is what sends the draw commands to vulkan
+void VulkanEngine::createCommandPool() {
+    // get device queue families
+    QueueFamilyIndices queueFamilyIndices = FindQueueFamilies(physicalDevice);
 
-void VulkanEngine::createVertexBuffer() {} // for setting up the vertex buffers, which is what's needed to render vert
-void VulkanEngine::createIndexBuffer() {} // for setting up the index buffers, which prevents vertex duplication inefficiency
-void VulkanEngine::createUniformBuffers() {} // for setting up the uniform buffer, which is needed for sampling later
+    // set up pool creation info
+    VkCommandPoolCreateInfo poolInfo{};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+    poolInfo.flags = 0; // Optional
+
+    // create command pool
+    if (vkCreateCommandPool(logicalDevice, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create command pool!");
+    }
+}
+
+// for setting up the vertex buffers, which is what's needed to render vertices without hard-coding
+// yes, it's singular
+void VulkanEngine::createVertexBuffer()
+{
+    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size(); // get buffer size
+
+    // go through staging aka temporary buffer
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory); // create temp buffer
+
+    // fill the staging buffer
+    void* data;
+    vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data); // go to memory region
+    memcpy(data, vertices.data(), (size_t)bufferSize); // copy data to memory
+    vkUnmapMemory(logicalDevice, stagingBufferMemory); // leave memory region
+
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory); // create buffer
+    copyBuffer(stagingBuffer, vertexBuffer, bufferSize); // copy buffer info from staging (aka temp) to main buffer
+
+    vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr); // destroy staging buffer
+    vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr); // free memory for staging buffer
+}
+
+// for creating index buffers, which prevents vertex duplication inefficiency
+void VulkanEngine::createIndexBuffer()
+{
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size(); // get buffer size
+
+    // go through staging aka temporary buffer
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+    // fill the staging buffer
+    void* data;
+    vkMapMemory(logicalDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, indices.data(), (size_t)bufferSize);
+    vkUnmapMemory(logicalDevice, stagingBufferMemory);
+
+    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory); // create buffer
+    copyBuffer(stagingBuffer, indexBuffer, bufferSize); // copy buffer info from staging (aka temp) to main buffer
+
+    vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr); // destroy staging buffer
+    vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr); // free memory for staging buffer
+}
+
 void VulkanEngine::createDescriptorPool() {} // for setting up the descriptor pool, which does stuff
 void VulkanEngine::createDescriptorSets() {} // for setting up the descriptor sets, which does stuff
 void VulkanEngine::createCommandBuffers() {} // for setting up the command buffer, which is the collection of commands
@@ -663,6 +727,114 @@ VkShaderModule VulkanEngine::createShaderModule(const std::vector<char>& code)
         throw std::runtime_error("failed to create shader module!");
 
     return shaderModule;
+}
+
+// generalization of buffer creation
+void VulkanEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory)
+{
+    // set up buffer creation info
+    VkBufferCreateInfo bufferInfo{};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    // create buffer
+    if (vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &buffer) != VK_SUCCESS)
+        throw std::runtime_error("failed to create buffer!");
+
+    // for reserving memory region for the vertex buffer
+    VkMemoryRequirements memRequirements;
+    vkGetBufferMemoryRequirements(logicalDevice, buffer, &memRequirements);
+
+    // set up memory allocation info
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+
+    // allocate memory
+    if (vkAllocateMemory(logicalDevice, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS)
+        throw std::runtime_error("failed to allocate buffer memory!");
+
+    vkBindBufferMemory(logicalDevice, buffer, bufferMemory, 0); // bind to buffer
+}
+
+// begin single-time command buffer
+VkCommandBuffer VulkanEngine::beginSingleTimeCommands()
+{
+    // set up buffer allocation info
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = commandPool;
+    allocInfo.commandBufferCount = 1;
+
+    // command buffer needed to transfer memory
+    // allocate memory for command buffer
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(logicalDevice, &allocInfo, &commandBuffer);
+
+    // set up command buffer recorder creation info
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; // for one-time usage
+
+    // record command buffer
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
+
+    return commandBuffer;
+}
+
+// end single-time command buffer
+void VulkanEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer)
+{
+    vkEndCommandBuffer(commandBuffer); // end command buffer recording. can now be used
+
+    // command submission info
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    // submit command to queue
+    vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    vkQueueWaitIdle(graphicsQueue);
+
+    vkFreeCommandBuffers(logicalDevice, commandPool, 1, &commandBuffer); // free command buffer
+}
+
+// generalization of buffer data copying
+void VulkanEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size)
+{
+    VkCommandBuffer commandBuffer = beginSingleTimeCommands(); // begin single-time command buffer
+
+    // copy region
+    VkBufferCopy copyRegion{};
+    //copyRegion.srcOffset = 0; // optional
+    //copyRegion.dstOffset = 0; // optional
+    copyRegion.size = size;
+    vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+
+    endSingleTimeCommands(commandBuffer); // end single-time command buffer
+}
+
+// for finding memory type of device needed for vertex buffers
+uint32_t VulkanEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+{
+    // get available memory types
+    VkPhysicalDeviceMemoryProperties memProperties;
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
+
+    // get first memory type that supports required operations
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
+        if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
+            return i;
+        }
+    }
+
+    // find failed
+    throw std::runtime_error("failed to find suitable memory type!");
 }
 
 void VulkanEngine::cleanSwapchain() {} // clean swapchain

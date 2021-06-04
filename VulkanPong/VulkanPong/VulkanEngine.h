@@ -43,16 +43,20 @@ private:
     VkCommandPool commandPool; // drawing command
     std::vector<VkCommandBuffer> commandBuffers; // the drawing command buffer
 
-    std::vector<Vertex> vertices; // non-global vertices
+    std::vector<Vertex> vertices = {
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+    };
     VkBuffer vertexBuffer; // the vertex buffer
     VkDeviceMemory vertexBufferMemory; // memory heap for storing vertex information
 
-    std::vector<uint32_t> indices; // non-global indices
+    std::vector<uint32_t> indices = {
+        0, 1, 2, 2, 3, 0
+    }; // non-global indices
     VkBuffer indexBuffer; // the index buffer
     VkDeviceMemory indexBufferMemory; // memory heap for storing index information
-
-    std::vector<VkBuffer> uniformBuffers; // the uniform buffers
-    std::vector<VkDeviceMemory> uniformBuffersMemory; // memory heap for storing uniform buffers
 
     VkDescriptorPool descriptorPool; // pool for descriptors
     std::vector<VkDescriptorSet> descriptorSets; // collection of descriptor sets
@@ -77,7 +81,6 @@ private:
 
     void createVertexBuffer(); // for setting up the vertex buffers, which is what's needed to render vert
     void createIndexBuffer(); // for setting up the index buffers, which prevents vertex duplication inefficiency
-    void createUniformBuffers(); // for setting up the uniform buffer, which is needed for sampling later
     void createDescriptorPool(); // for setting up the descriptor pool, which does stuff
     void createDescriptorSets(); // for setting up the descriptor sets, which does stuff
     void createCommandBuffers(); // for setting up the command buffer, which is the collection of commands
@@ -90,4 +93,10 @@ private:
     QueueFamilyIndices FindQueueFamilies(VkPhysicalDevice device);
     VkImageView CreateImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, uint32_t mipLevels);
     VkShaderModule createShaderModule(const std::vector<char>& code);
+
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+    VkCommandBuffer beginSingleTimeCommands();
+    void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+    void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 };

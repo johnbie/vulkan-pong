@@ -142,8 +142,6 @@ VkExtent2D VulkanEngineHelper::ChooseSwapExtent(GLFWwindow* window, const VkSurf
     }
 }
 
-
-
 // file reader function
 std::vector<char> VulkanEngineHelper::ReadFile(const std::string& filename)
 {
