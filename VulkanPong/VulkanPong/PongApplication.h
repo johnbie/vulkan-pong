@@ -1,3 +1,4 @@
+#pragma once
 #include "AppObject.h"
 #include "VulkanEngine.h"
 

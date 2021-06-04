@@ -159,6 +159,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PongApplication.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
+    <ClCompile Include="VulkanEngineHelper.cpp" />
+    <ClCompile Include="VulkanEngineHelper.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h" />

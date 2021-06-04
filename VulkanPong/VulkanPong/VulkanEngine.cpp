@@ -1,5 +1,22 @@
+#pragma once
 #include "VulkanEngine.h"
+#include "VulkanEngineHelper.h"
 #include "Debug.h"
+
+// c++ libraries
+#include <iostream>
+//#include <fstream>
+//#include <stdexcept>
+//#include <algorithm>
+//#include <chrono>
+//#include <vector>
+//#include <cstring>
+//#include <cstdlib>
+//#include <cstdint>
+//#include <array>
+//#include <optional>
+//#include <set>
+//#include <unordered_map>
 
 VulkanEngine::VulkanEngine(bool initialize)
 {
@@ -77,7 +94,8 @@ void VulkanEngine::clean()
     vkFreeMemory(logicalDevice, vertexBufferMemory, nullptr); // free the memory reserved for vertex buffer
 
     // delete the sync objects
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
         vkDestroySemaphore(logicalDevice, renderFinishedSemaphores[i], nullptr);
         vkDestroySemaphore(logicalDevice, imageAvailableSemaphores[i], nullptr);
         vkDestroyFence(logicalDevice, inFlightFences[i], nullptr);
@@ -87,17 +105,63 @@ void VulkanEngine::clean()
     vkDestroyDevice(logicalDevice, nullptr); // delete logical device
 
     // if validation layer was on...
-    if (Debug::ENABLE_VALIDATION_LAYERS) {
+    if (Debug::ENABLE_VALIDATION_LAYERS)
         Debug::DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr); // delete debug utils
-    }
 
     vkDestroySurfaceKHR(instance, surface, nullptr); // delete surface instance, which is device-specific
     vkDestroyInstance(instance, nullptr); // delete instance
 }
 
+// create instance for vulkan, which is needed to do vulkan stuff
+void VulkanEngine::createInstance()
+{
+    // if validation layer is on but not all the requested layers are available
+    if (Debug::ENABLE_VALIDATION_LAYERS && !VulkanEngineHelper::checkValidationLayerSupport())
+    {
+        throw std::runtime_error("validation layers requested, but not available!");
+    }
 
+    // set up vulkan app info
+    VkApplicationInfo appInfo{};
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO; // need to specify explicitly by design
+    appInfo.pApplicationName = "Da Triangle";
+    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName = "No Engine";
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_0;
 
-void VulkanEngine::createInstance() {} // create vulkan instance
+    // info about vulcan instance creation process
+    VkInstanceCreateInfo createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO; // need to specify explicitly by design
+    createInfo.pApplicationInfo = &appInfo;
+
+    // get required extensions
+    // extensions are the tools available for use on the device
+    auto extensions = VulkanEngineHelper::getRequiredExtensions();
+    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+    createInfo.ppEnabledExtensionNames = extensions.data();
+
+    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
+    if (Debug::ENABLE_VALIDATION_LAYERS)
+    {
+        createInfo.enabledLayerCount = static_cast<uint32_t>(VulkanEngineHelper::validationLayers.size());
+        createInfo.ppEnabledLayerNames = VulkanEngineHelper::validationLayers.data();
+
+        Debug::PopulateDebugMessengerCreateInfo(debugCreateInfo);
+        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+    }
+    else
+    {
+        createInfo.enabledLayerCount = 0;
+        createInfo.pNext = nullptr;
+    }
+
+    // error check
+    if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create instance!");
+    }
+}
 void VulkanEngine::setupDebugMessenger() {} // setup debug messenger
 void VulkanEngine::createSurface() {} // for surface info, which is device-specific
 void VulkanEngine::pickPhysicalDevice() {} // for looking for graphics card in system

@@ -1,3 +1,4 @@
+#pragma once
 #include "AppObject.h"
 
 AppObject::AppObject(bool initialize)

@@ -1,6 +1,7 @@
-// public functions
+#pragma once
 #include "PongApplication.h"
 
+// public functions
 PongApplication::PongApplication(uint32_t width, uint32_t height, bool initialize) : WIDTH(width), HEIGHT(height)
 {
     if (initialize)

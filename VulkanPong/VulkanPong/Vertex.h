@@ -1,3 +1,4 @@
+#pragma once
 #include "pch.h"
 
 #define GLM_ENABLE_EXPERIMENTAL

@@ -1,3 +1,4 @@
+#pragma once
 #include "AppObject.h"
 #include "Vertex.h"
 #include "pch.h"
@@ -59,7 +60,6 @@ private:
     std::vector<VkFence> imagesInFlight; // 
     size_t currentFrame = 0; // tracks the current frame of the application. 0 <= currentFrame < MAX_FRAMES_IN_FLIGHT
 
-
     void createInstance(); // create vulkan instance
     void setupDebugMessenger(); // setup debug messenger
     void createSurface(); // for surface info, which is device-specific
@@ -83,4 +83,7 @@ private:
     void createCommandBuffers(); // for setting up the command buffer, which is the collection of commands
     void createSyncObjects(); // for setting up the various sync objects, which are needed for real-time drawing
     void cleanSwapchain(); // clean swapchain
+
+    // helper functions
+    bool checkValidationLayerSupport(); // used with createInstance()
 };

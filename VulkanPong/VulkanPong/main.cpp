@@ -1,3 +1,4 @@
+#pragma once
 #include "PongApplication.h"
 
 #include <iostream>
