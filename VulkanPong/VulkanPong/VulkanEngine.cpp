@@ -65,8 +65,6 @@ void VulkanEngine::initialize()
     createCommandPool(); // for setting up the command pool, which is what sends the draw commands to vulkan
     createVertexBuffer(); // for setting up the vertex buffers, which is what's needed to render vert
     createIndexBuffer(); // for setting up the index buffers, which prevents vertex duplication inefficiency
-    createDescriptorPool(); // for setting up the descriptor pool, which does stuff
-    createDescriptorSets(); // for setting up the descriptor sets, which does stuff
     createCommandBuffers(); // for setting up the command buffer, which is the collection of commands
     createSyncObjects(); // for setting up the various sync objects, which are needed for real-time drawing
 }
@@ -593,11 +591,92 @@ void VulkanEngine::createIndexBuffer()
     vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr); // free memory for staging buffer
 }
 
-void VulkanEngine::createDescriptorPool() {} // for setting up the descriptor pool, which does stuff
-void VulkanEngine::createDescriptorSets() {} // for setting up the descriptor sets, which does stuff
-void VulkanEngine::createCommandBuffers() {} // for setting up the command buffer, which is the collection of commands
-void VulkanEngine::createSyncObjects() {} // for setting up the various sync objects, which are needed for real-time drawing
+// for setting up the command buffer, which is the collection of commands
+void VulkanEngine::createCommandBuffers()
+{
+    // resize command buffer to match the swap chain frame buffer sizez
+    commandBuffers.resize(swapChainFramebuffers.size());
 
+    // set up command buffer creation info
+    VkCommandBufferAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = commandPool;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+    // create command buffer
+    if (vkAllocateCommandBuffers(logicalDevice, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
+
+    // record command buffer
+    for (size_t i = 0; i < commandBuffers.size(); i++) {
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPass;
+        renderPassInfo.framebuffer = swapChainFramebuffers[i];
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = swapChainExtent;
+
+        VkClearValue clearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+        renderPassInfo.clearValueCount = 1;
+        renderPassInfo.pClearValues = &clearColor;
+
+        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
+
+        VkBuffer vertexBuffers[] = { vertexBuffer };
+        VkDeviceSize offsets[] = { 0 };
+        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+
+        vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+        vkCmdDrawIndexed(commandBuffers[i], static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
+        vkCmdEndRenderPass(commandBuffers[i]);
+
+        if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+}
+
+// for creating the various sync objects, which are needed for real-time drawing
+void VulkanEngine::createSyncObjects()
+{
+    // set up the various vectors
+    imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+    inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+    imagesInFlight.resize(swapChainImages.size(), VK_NULL_HANDLE);
+
+    // set up semaphore creation info
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    // set up the fences to be in a signalled state so that it's as if they were called before
+    VkFenceCreateInfo fenceInfo{};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    // create sync objects for max in-flight frames
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        // create sync objects
+        if (vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
+            vkCreateSemaphore(logicalDevice, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
+            vkCreateFence(logicalDevice, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create synchronization objects for a frame!");
+        }
+    }
+}
 
 // checks if device is suitable for what we want to do
 // this includes supporting swapchains

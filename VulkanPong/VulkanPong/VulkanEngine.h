@@ -81,8 +81,6 @@ private:
 
     void createVertexBuffer(); // for setting up the vertex buffers, which is what's needed to render vert
     void createIndexBuffer(); // for setting up the index buffers, which prevents vertex duplication inefficiency
-    void createDescriptorPool(); // for setting up the descriptor pool, which does stuff
-    void createDescriptorSets(); // for setting up the descriptor sets, which does stuff
     void createCommandBuffers(); // for setting up the command buffer, which is the collection of commands
     void createSyncObjects(); // for setting up the various sync objects, which are needed for real-time drawing
     void cleanSwapchain(); // clean swapchain
