@@ -8,7 +8,7 @@
 class VulkanEngine : public AppObject
 {
 public:
-    VulkanEngine(bool initialize = false);
+    VulkanEngine(GLFWwindow* window, bool initialize = false);
 protected:
     virtual void initialize();
     virtual void update();
@@ -17,7 +17,9 @@ private:
     // constants
     const int MAX_FRAMES_IN_FLIGHT = 2;
 
+    GLFWwindow* window; // glfw window instance
     VkInstance instance; // the vulkan instance
+
     VkDebugUtilsMessengerEXT debugMessenger; // explicit debug messenger
     VkSurfaceKHR surface; // surface
     VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // physical device

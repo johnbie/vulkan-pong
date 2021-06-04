@@ -31,9 +31,6 @@ void PongApplication::Run()
 
 void PongApplication::initialize()
 {
-    // set up vulkan
-    vulkanEngine = new VulkanEngine(true);
-
     // initialze the glfw instance
     glfwInit();
 
@@ -45,6 +42,9 @@ void PongApplication::initialize()
     window = glfwCreateWindow(WIDTH, HEIGHT, "Pong", nullptr, nullptr);
     glfwSetWindowUserPointer(window, this);
     // glfwSetFramebufferSizeCallback(window, framebufferResizeCallback); // callback for resizing
+    
+    // set up vulkan
+    vulkanEngine = new VulkanEngine(window, true);
 }
 
 void PongApplication::update()

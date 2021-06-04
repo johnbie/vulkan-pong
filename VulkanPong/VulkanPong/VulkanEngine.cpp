@@ -18,8 +18,11 @@
 //#include <set>
 //#include <unordered_map>
 
-VulkanEngine::VulkanEngine(bool initialize)
+VulkanEngine::VulkanEngine(GLFWwindow* window, bool initialize)
 {
+    // glfw window instance
+    this->window = window; 
+
     if (initialize)
         this->initialize();
     else
@@ -162,8 +165,29 @@ void VulkanEngine::createInstance()
         throw std::runtime_error("failed to create instance!");
     }
 }
-void VulkanEngine::setupDebugMessenger() {} // setup debug messenger
-void VulkanEngine::createSurface() {} // for surface info, which is device-specific
+
+// setup debugger instance
+void VulkanEngine::setupDebugMessenger()
+{
+    if (!Debug::ENABLE_VALIDATION_LAYERS) return;
+
+    // setup code
+    VkDebugUtilsMessengerCreateInfoEXT createInfo;
+    Debug::PopulateDebugMessengerCreateInfo(createInfo); // populate data
+
+    // if failed
+    if (Debug::CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
+        throw std::runtime_error("failed to set up debug messenger!");
+}
+
+// for surface info, which is device-specific
+void VulkanEngine::createSurface()
+{
+    // can take simple parameters instead of structs, which is amazing
+    if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+        throw std::runtime_error("failed to create surface for window!");
+}
+
 void VulkanEngine::pickPhysicalDevice() {} // for looking for graphics card in system
 void VulkanEngine::createLogicalDevice() {} // for logical device, which is needed for figuring out what device should be used for our application
 void VulkanEngine::createSwapChain() {} // for swap chains, which allow frame-by-frame rendering via image queuing
