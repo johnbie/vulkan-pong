@@ -71,6 +71,11 @@ void VulkanEngine::initialize()
 
 void VulkanEngine::update()
 {
+    //if (vertexHa)
+    //    vertices[0].pos = { -0.5f, -0.5f };
+    //else vertices[0].pos = { -1.0f, -1.0f };
+    //vertexHa = !vertexHa;
+
     vkWaitForFences(logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;

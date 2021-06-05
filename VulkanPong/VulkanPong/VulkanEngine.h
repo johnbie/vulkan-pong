@@ -19,6 +19,8 @@ private:
     // constants
     const int MAX_FRAMES_IN_FLIGHT = 2;
 
+    bool vertexHa = false;
+
     GLFWwindow* window; // glfw window instance
     VkInstance instance; // the vulkan instance
 
@@ -44,16 +46,26 @@ private:
     std::vector<VkCommandBuffer> commandBuffers; // the drawing command buffer
 
     std::vector<Vertex> vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}},
+        {{-0.866666667f, -0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{-0.85f, -0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{-0.85f, 0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{-0.866666667f, 0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{0.85f, -0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{0.866666667f, -0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{0.866666667f, 0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{0.85f, 0.1f}, {1.0f, 1.0f, 1.0f}},
+        {{-0.008333333f, -0.01f}, {1.0f, 1.0f, 1.0f}},
+        {{0.008333333f, -0.01f}, {1.0f, 1.0f, 1.0f}},
+        {{0.008333333f, 0.01f}, {1.0f, 1.0f, 1.0f}},
+        {{-0.008333333f, 0.01f}, {1.0f, 1.0f, 1.0f}}
     };
     VkBuffer vertexBuffer; // the vertex buffer
     VkDeviceMemory vertexBufferMemory; // memory heap for storing vertex information
 
     std::vector<uint16_t> indices = {
-        0, 1, 2, 2, 3, 0
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4,
+        8, 9, 10, 10, 11, 8
     }; // non-global indices
     VkBuffer indexBuffer; // the index buffer
     VkDeviceMemory indexBufferMemory; // memory heap for storing index information
