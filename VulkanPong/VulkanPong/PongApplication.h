@@ -18,6 +18,7 @@ protected:
     virtual void clean();
 private:
     const uint32_t WIDTH, HEIGHT;
+    const uint32_t PIXEL_SIZE = 10;
     GLFWwindow* window; // glfw window instance
     VulkanEngine* vulkanEngine; // glfw window instance
 };

@@ -44,15 +44,15 @@ private:
     std::vector<VkCommandBuffer> commandBuffers; // the drawing command buffer
 
     std::vector<Vertex> vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{-0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}},
         {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
         {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}},
     };
     VkBuffer vertexBuffer; // the vertex buffer
     VkDeviceMemory vertexBufferMemory; // memory heap for storing vertex information
 
-    std::vector<uint32_t> indices = {
+    std::vector<uint16_t> indices = {
         0, 1, 2, 2, 3, 0
     }; // non-global indices
     VkBuffer indexBuffer; // the index buffer
@@ -84,6 +84,7 @@ private:
     void createCommandBuffers(); // for setting up the command buffer, which is the collection of commands
     void createSyncObjects(); // for setting up the various sync objects, which are needed for real-time drawing
     void cleanSwapchain(); // clean swapchain
+    void recreateSwapchain(); // clean swapchain
 
     // helper functions
     bool DeviceIsSuitable(VkPhysicalDevice device);
