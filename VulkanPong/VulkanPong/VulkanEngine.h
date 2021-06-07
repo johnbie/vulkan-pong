@@ -19,6 +19,8 @@ private:
     // constants
     const int MAX_FRAMES_IN_FLIGHT = 2;
 
+    //bool vertexHa = false;
+
     GLFWwindow* window; // glfw window instance
     VkInstance instance; // the vulkan instance
 
