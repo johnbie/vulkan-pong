@@ -160,6 +160,8 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PongApplication.cpp" />
     <ClCompile Include="QueueFamilyIndices.h" />
+    <ClCompile Include="RectangleObject.cpp" />
+    <ClCompile Include="RectangleObject.h" />
     <ClCompile Include="VulkanEngine.cpp" />
     <ClCompile Include="VulkanEngineHelper.cpp" />
     <ClCompile Include="VulkanEngineHelper.h" />

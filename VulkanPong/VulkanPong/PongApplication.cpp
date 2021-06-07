@@ -2,10 +2,10 @@
 #include "PongApplication.h"
 
 // public functions
-PongApplication::PongApplication(uint32_t width, uint32_t height, bool initialize) : WIDTH(width), HEIGHT(height)
+PongApplication::PongApplication(bool initialize)
 {
     if (initialize)
-        this->initialize();
+        this->Initialize();
     else 
     {
         vulkanEngine = nullptr;
@@ -43,8 +43,21 @@ void PongApplication::initialize()
     glfwSetWindowUserPointer(window, this);
     // glfwSetFramebufferSizeCallback(window, framebufferResizeCallback); // callback for resizing
     
+    // create vulkan object
+    vulkanEngine = new VulkanEngine(window);
+
+    // set up vertices for rectangle objects
+    // need 1 for the ball, 2 for the two paddles, and 16 for score-tracking
+    int gameObjectCount = 3;
+    Vertex* vertices = vulkanEngine->AllocateVerticesAndIndicesForRectangles(gameObjectCount);
+    
+    // instantiate objects
+    p1 = new RectangleObject(vertices, 16, 92, 2, 20, true);
+    p2 = new RectangleObject(vertices+4, 222, 92, 2, 20, true);
+    ball = new RectangleObject(vertices+8, 119, 99, 2, 2, true);
+
     // set up vulkan
-    vulkanEngine = new VulkanEngine(window, true);
+    vulkanEngine->Initialize();
 }
 
 void PongApplication::update()
@@ -52,9 +65,10 @@ void PongApplication::update()
     // continuous polling. alternative is glfwWaitEvents, which waits for events to occur
     glfwPollEvents();
 
-    // update something here
-    
     // set positions and indices
+    p1->Update();
+    p2->Update();
+    ball->Update();
 
     // update vulkan
     vulkanEngine->Update();

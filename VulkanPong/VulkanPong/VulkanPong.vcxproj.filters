@@ -48,6 +48,12 @@
     <ClCompile Include="HelloTriangleApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RectangleObject.h">
+      <Filter>Header Files\AppObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangleObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">

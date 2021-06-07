@@ -11,6 +11,7 @@ class VulkanEngine : public AppObject
 {
 public:
     VulkanEngine(GLFWwindow* window, bool initialize = false);
+    Vertex* AllocateVerticesAndIndicesForRectangles(int count);
 protected:
     virtual void initialize();
     virtual void update();
@@ -45,20 +46,21 @@ private:
     VkCommandPool commandPool; // drawing command
     std::vector<VkCommandBuffer> commandBuffers; // the drawing command buffer
 
-    std::vector<Vertex> vertices = {
-        {{-0.866666667f, -0.1f}},
-        {{-0.85f, -0.1f}},
-        {{-0.85f, 0.1f}},
-        {{-0.866666667f, 0.1f}},
-        {{0.85f, -0.1f}},
-        {{0.866666667f, -0.1f}},
-        {{0.866666667f, 0.1f}},
-        {{0.85f, 0.1f}},
-        {{-0.008333333f, -0.01f}},
-        {{0.008333333f, -0.01f}},
-        {{0.008333333f, 0.01f}},
-        {{-0.008333333f, 0.01f}}
-    };
+    std::vector<Vertex> vertices;
+    //std::vector<Vertex> vertices = {
+    //    {{-0.866666667f, -0.1f}},
+    //    {{-0.85f, -0.1f}},
+    //    {{-0.85f, 0.1f}},
+    //    {{-0.866666667f, 0.1f}},
+    //    {{0.85f, -0.1f}},
+    //    {{0.866666667f, -0.1f}},
+    //    {{0.866666667f, 0.1f}},
+    //    {{0.85f, 0.1f}},
+    //    {{-0.008333333f, -0.01f}},
+    //    {{0.008333333f, -0.01f}},
+    //    {{0.008333333f, 0.01f}},
+    //    {{-0.008333333f, 0.01f}}
+    //};
     std::vector<VkBuffer> vertexBuffers; // the vertex buffers
     std::vector<VkDeviceMemory> vertexBuffersMemory; // memory heap for storing vertex buffers
     //VkBuffer vertexBuffer; // the vertex buffer

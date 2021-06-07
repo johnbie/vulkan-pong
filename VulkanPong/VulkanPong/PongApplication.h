@@ -1,5 +1,6 @@
 #pragma once
 #include "AppObject.h"
+#include "RectangleObject.h"
 #include "VulkanEngine.h"
 
 // #include "pch.h"
@@ -10,15 +11,17 @@
 class PongApplication : public AppObject
 {
 public:
-    PongApplication(uint32_t width, uint32_t height, bool initialize = false);
+    PongApplication(bool initialize = false);
     void Run();
 protected:
     virtual void initialize();
     virtual void update();
     virtual void clean();
 private:
-    const uint32_t WIDTH, HEIGHT;
-    const uint32_t PIXEL_SIZE = 10;
+    RectangleObject* p1;
+    RectangleObject* p2;
+    RectangleObject* ball;
+    
     GLFWwindow* window; // glfw window instance
     VulkanEngine* vulkanEngine; // glfw window instance
 };

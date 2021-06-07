@@ -4,14 +4,10 @@
 
 #include <iostream>
 
-const uint32_t WIDTH = 1200;
-const uint32_t HEIGHT = 1000;
-
-
 // code runner
 int main() {
     //HelloTriangleApplication app(WIDTH, HEIGHT);
-    PongApplication app(WIDTH, HEIGHT);
+    PongApplication app;
 
     try {
         app.Run();

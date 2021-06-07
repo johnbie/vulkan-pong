@@ -48,6 +48,28 @@ VulkanEngine::VulkanEngine(GLFWwindow* window, bool initialize)
         swapChainImageFormat = VkFormat{};
     }
 }
+
+Vertex* VulkanEngine::AllocateVerticesAndIndicesForRectangles(int count)
+{
+    // allocate vectors by size
+    vertices.resize(count * 4);
+    indices.resize(count * 6);
+
+    // set indices
+    for (int i = 0; i < count; i++)
+    {
+        indices[(i * 6)] = (i * 4);
+        indices[(i * 6)+1] = (i * 4) + 1;
+        indices[(i * 6)+2] = (i * 4) + 2;
+        indices[(i * 6)+3] = (i * 4) + 2;
+        indices[(i * 6)+4] = (i * 4) + 3;
+        indices[(i * 6)+5] = (i * 4);
+    }
+
+    // return vertices
+    return vertices.data();
+}
+
 void VulkanEngine::initialize()
 {
     createInstance(); // create vulkan instance
