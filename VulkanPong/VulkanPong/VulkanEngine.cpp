@@ -40,8 +40,6 @@ VulkanEngine::VulkanEngine(GLFWwindow* window, bool initialize)
         graphicsPipeline = nullptr;
         commandPool = nullptr;
 
-        vertexBuffer = nullptr;
-        vertexBufferMemory = nullptr;
         indexBuffer = nullptr;
         indexBufferMemory = nullptr;
 
@@ -71,11 +69,6 @@ void VulkanEngine::initialize()
 
 void VulkanEngine::update()
 {
-    //if (vertexHa)
-    //    vertices[0].pos = { -0.5f, -0.5f };
-    //else vertices[0].pos = { -1.0f, -1.0f };
-    //vertexHa = !vertexHa;
-
     vkWaitForFences(logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
     uint32_t imageIndex;
@@ -93,6 +86,13 @@ void VulkanEngine::update()
         vkWaitForFences(logicalDevice, 1, &imagesInFlight[imageIndex], VK_TRUE, UINT64_MAX);
     
     imagesInFlight[imageIndex] = inFlightFences[currentFrame];
+
+    // update vertices
+    //if (vertexHa)
+    //    vertices[0].pos = { -0.5f, -0.5f };
+    //else vertices[0].pos = { -1.0f, -1.0f };
+    //vertexHa = !vertexHa;
+    updateVertexBuffer(imageIndex);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -138,6 +138,7 @@ void VulkanEngine::update()
         throw std::runtime_error("failed to present swap chain image!");
 
     currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+
 }
 
 void VulkanEngine::clean()
@@ -151,8 +152,20 @@ void VulkanEngine::clean()
     vkDestroyBuffer(logicalDevice, indexBuffer, nullptr); // delete index buffer
     vkFreeMemory(logicalDevice, indexBufferMemory, nullptr); // free the memory reserved for index buffer
 
-    vkDestroyBuffer(logicalDevice, vertexBuffer, nullptr); // delete vertex buffer
-    vkFreeMemory(logicalDevice, vertexBufferMemory, nullptr); // free the memory reserved for vertex buffer
+    // delete vertex buffers
+    for (auto vertexBuffer : vertexBuffers)
+    {
+        vkDestroyBuffer(logicalDevice, vertexBuffer, nullptr);
+    }
+
+    // free the memory reserved for vertex buffers
+    for (auto vertexBufferMemory : vertexBuffersMemory)
+    {
+        vkFreeMemory(logicalDevice, vertexBufferMemory, nullptr);
+    }
+
+    //vkDestroyBuffer(logicalDevice, vertexBuffer, nullptr); 
+    //vkFreeMemory(logicalDevice, vertexBufferMemory, nullptr); 
 
     // delete the sync objects
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
@@ -641,6 +654,9 @@ void VulkanEngine::createVertexBuffer()
 {
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size(); // get buffer size
 
+    vertexBuffers.resize(swapChainImages.size()); // resize buffer vectors
+    vertexBuffersMemory.resize(swapChainImages.size()); // resize buffer memory region vectors
+
     // go through staging aka temporary buffer
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
@@ -652,11 +668,24 @@ void VulkanEngine::createVertexBuffer()
     memcpy(data, vertices.data(), (size_t)bufferSize); // copy data to memory
     vkUnmapMemory(logicalDevice, stagingBufferMemory); // leave memory region
 
-    createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory); // create buffer
-    copyBuffer(stagingBuffer, vertexBuffer, bufferSize); // copy buffer info from staging (aka temp) to main buffer
+    // create buffer for each
+    for (size_t i = 0; i < swapChainImages.size(); i++) {
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffers[i], vertexBuffersMemory[i]); // create buffer
+        copyBuffer(stagingBuffer, vertexBuffers[i], bufferSize); // copy buffer info from staging (aka temp) to main buffer
+    }
 
     vkDestroyBuffer(logicalDevice, stagingBuffer, nullptr); // destroy staging buffer
     vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr); // free memory for staging buffer
+}
+void VulkanEngine::updateVertexBuffer(uint32_t currentImage)
+{
+    VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size(); // get buffer size
+
+    // update datea
+    void* data;
+    vkMapMemory(logicalDevice, vertexBuffersMemory[currentImage], 0, bufferSize, 0, &data);
+    memcpy(data, vertices.data(), (size_t)bufferSize); // copy data to memory
+    vkUnmapMemory(logicalDevice, vertexBuffersMemory[currentImage]);
 }
 
 // for creating index buffers, which prevents vertex duplication inefficiency
@@ -725,9 +754,9 @@ void VulkanEngine::createCommandBuffers()
 
         vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
-        VkBuffer vertexBuffers[] = { vertexBuffer };
+        //VkBuffer _vertexBuffers[] = vertexBuffers.;
         VkDeviceSize offsets[] = { 0 };
-        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
+        vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, &vertexBuffers[0], offsets);
 
         vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 

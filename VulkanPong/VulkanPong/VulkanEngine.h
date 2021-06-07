@@ -19,8 +19,6 @@ private:
     // constants
     const int MAX_FRAMES_IN_FLIGHT = 2;
 
-    bool vertexHa = false;
-
     GLFWwindow* window; // glfw window instance
     VkInstance instance; // the vulkan instance
 
@@ -46,21 +44,23 @@ private:
     std::vector<VkCommandBuffer> commandBuffers; // the drawing command buffer
 
     std::vector<Vertex> vertices = {
-        {{-0.866666667f, -0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{-0.85f, -0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{-0.85f, 0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{-0.866666667f, 0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{0.85f, -0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{0.866666667f, -0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{0.866666667f, 0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{0.85f, 0.1f}, {1.0f, 1.0f, 1.0f}},
-        {{-0.008333333f, -0.01f}, {1.0f, 1.0f, 1.0f}},
-        {{0.008333333f, -0.01f}, {1.0f, 1.0f, 1.0f}},
-        {{0.008333333f, 0.01f}, {1.0f, 1.0f, 1.0f}},
-        {{-0.008333333f, 0.01f}, {1.0f, 1.0f, 1.0f}}
+        {{-0.866666667f, -0.1f}},
+        {{-0.85f, -0.1f}},
+        {{-0.85f, 0.1f}},
+        {{-0.866666667f, 0.1f}},
+        {{0.85f, -0.1f}},
+        {{0.866666667f, -0.1f}},
+        {{0.866666667f, 0.1f}},
+        {{0.85f, 0.1f}},
+        {{-0.008333333f, -0.01f}},
+        {{0.008333333f, -0.01f}},
+        {{0.008333333f, 0.01f}},
+        {{-0.008333333f, 0.01f}}
     };
-    VkBuffer vertexBuffer; // the vertex buffer
-    VkDeviceMemory vertexBufferMemory; // memory heap for storing vertex information
+    std::vector<VkBuffer> vertexBuffers; // the vertex buffers
+    std::vector<VkDeviceMemory> vertexBuffersMemory; // memory heap for storing vertex buffers
+    //VkBuffer vertexBuffer; // the vertex buffer
+    //VkDeviceMemory vertexBufferMemory; // memory heap for storing vertex information
 
     std::vector<uint16_t> indices = {
         0, 1, 2, 2, 3, 0,
@@ -92,6 +92,7 @@ private:
     void createCommandPool(); // for setting up the command pool, which is what sends the draw commands to vulkan
 
     void createVertexBuffer(); // for setting up the vertex buffers, which is what's needed to render vert
+    void updateVertexBuffer(uint32_t currentImage);
     void createIndexBuffer(); // for setting up the index buffers, which prevents vertex duplication inefficiency
     void createCommandBuffers(); // for setting up the command buffer, which is the collection of commands
     void createSyncObjects(); // for setting up the various sync objects, which are needed for real-time drawing
