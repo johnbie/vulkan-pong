@@ -18,10 +18,12 @@ protected:
     void updateSize(int width, int height);
     void updateWidth(int width);
     void updateHeight(int height);
+    bool incrementHPos(int offset);
+    bool incrementVPos(int offset);
 private:
     // pointer to top-left corner of dynamically allocated vertex, which can be treated like a dynamic array
-    Vertex* vertices;
-    int topLeftHPos, topLeftVPos, width, height;
-    bool isVisible;
+    Vertex* _vertices;
+    int _topLeftHPos, _topLeftVPos, _width, _height;
+    bool _isVisible;
     void updateVertices();
 };

@@ -1,6 +1,8 @@
 #pragma once
 #include "AppObject.h"
 #include "RectangleObject.h"
+#include "BallObject.h"
+#include "PaddleObject.h"
 #include "VulkanEngine.h"
 
 // #include "pch.h"
@@ -18,9 +20,10 @@ protected:
     virtual void update();
     virtual void clean();
 private:
-    RectangleObject* p1;
-    RectangleObject* p2;
-    RectangleObject* ball;
+    int _time;
+    PaddleObject* p1;
+    PaddleObject* p2;
+    BallObject* ball;
     
     GLFWwindow* window; // glfw window instance
     VulkanEngine* vulkanEngine; // glfw window instance
