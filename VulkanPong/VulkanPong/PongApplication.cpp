@@ -40,6 +40,45 @@ void PongApplication::playBootMusic()
     beep(1760, 80);
 }
 
+void PongApplication::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+        PongApplication::_p1UpHold = true;
+    }
+    else if (key == GLFW_KEY_W && action == GLFW_RELEASE)
+    {
+        PongApplication::_p1UpHold = false;
+    }
+    
+    if (key == GLFW_KEY_S && action == GLFW_PRESS)
+    {
+        PongApplication::_p1DownHold = true;
+    }
+    else if (key == GLFW_KEY_S && action == GLFW_RELEASE)
+    {
+        PongApplication::_p1DownHold = false;
+    }
+    
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+    {
+        PongApplication::_p2UpHold = true;
+    }
+    else if (key == GLFW_KEY_UP && action == GLFW_RELEASE)
+    {
+        PongApplication::_p2UpHold = false;
+    }
+    
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+    {
+        PongApplication::_p2DownHold = true;
+    }
+    else if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE)
+    {
+        PongApplication::_p2DownHold = false;
+    }
+}
+
 void PongApplication::initialize()
 {
     // play boot music
@@ -58,6 +97,9 @@ void PongApplication::initialize()
     glfwSetWindowUserPointer(window, this);
     // glfwSetFramebufferSizeCallback(window, framebufferResizeCallback); // callback for resizing
     
+    // set key callback
+    glfwSetKeyCallback(window, keyCallback);
+
     // create vulkan object
     vulkanEngine = new VulkanEngine(window);
 
@@ -108,12 +150,14 @@ void PongApplication::update()
     // current time
     auto currentTime = std::chrono::high_resolution_clock::now();
     int time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count() * 15;
-
+    
     if (_time != time)
     {
         _time = time;
 
         // set positions and indices
+        p1->move(PongApplication::_p1UpHold, PongApplication::_p1DownHold);
+        p2->move(PongApplication::_p2UpHold, PongApplication::_p2DownHold);
         p1->Update();
         p2->Update();
         ball->Update();

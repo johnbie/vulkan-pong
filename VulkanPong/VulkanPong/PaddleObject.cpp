@@ -10,7 +10,6 @@ PaddleObject::PaddleObject(Vertex* vertices, bool isP1, bool initialize) : Recta
 		RectangleObject::incrementHPos(PIXEL_WIDTH - 14);
 	
 	_isP1 = isP1;
-	_goUp = false;
 };
 
 void PaddleObject::initialize()
@@ -20,7 +19,7 @@ void PaddleObject::initialize()
 
 void PaddleObject::update()
 {
-	bounce();
+	//move();
 	RectangleObject::update();
 }
 
@@ -29,10 +28,10 @@ void PaddleObject::clean()
 	RectangleObject::clean();
 }
 
-void PaddleObject::bounce()
+void PaddleObject::move(bool upHold, bool downHold)
 {
-	bool bounced = _goUp ? incrementVPos(-2) : incrementVPos(2);
-
-	if (bounced)
-		_goUp = !_goUp;
+	if (upHold && !downHold)
+		incrementVPos(-4);
+	else if (downHold && !upHold)
+		incrementVPos(4);
 }
