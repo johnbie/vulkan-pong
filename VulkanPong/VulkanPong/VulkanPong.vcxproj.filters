@@ -45,9 +45,6 @@
     <ClCompile Include="VulkanEngineHelper.h">
       <Filter>Header Files\Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="HelloTriangleApplication.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RectangleObject.h">
       <Filter>Header Files\AppObjects</Filter>
     </ClCompile>
@@ -81,9 +78,6 @@
       <Filter>Header Files\AppObjects</Filter>
     </ClInclude>
     <ClInclude Include="VulkanEngine.h">
-      <Filter>Header Files\AppObjects</Filter>
-    </ClInclude>
-    <ClInclude Include="HelloTriangleApplication.h">
       <Filter>Header Files\AppObjects</Filter>
     </ClInclude>
     <ClInclude Include="BallObject.h">

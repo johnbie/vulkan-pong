@@ -32,12 +32,12 @@ void PongApplication::Run()
 
 void PongApplication::playBootMusic()
 {
-    beep(55, 100);
-    beep(110, 100);
-    beep(220, 100);
-    beep(440, 100);
-    beep(880, 100);
-    beep(1760, 100);
+    beep(55, 80);
+    beep(110, 80);
+    beep(220, 80);
+    beep(440, 80);
+    beep(880, 80);
+    beep(1760, 80);
 }
 
 void PongApplication::initialize()

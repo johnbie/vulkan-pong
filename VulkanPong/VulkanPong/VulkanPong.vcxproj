@@ -157,7 +157,6 @@
   <ItemGroup>
     <ClCompile Include="AppObject.cpp" />
     <ClCompile Include="BallObject.cpp" />
-    <ClCompile Include="HelloTriangleApplication.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PaddleObject.cpp" />
     <ClCompile Include="PongApplication.cpp" />
@@ -177,7 +176,6 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PongApplication.h" />
     <ClInclude Include="SwapChainSupportDetails.h" />
-    <ClInclude Include="HelloTriangleApplication.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanEngine.h" />
   </ItemGroup>
