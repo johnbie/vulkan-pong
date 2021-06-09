@@ -89,11 +89,11 @@
     <ClInclude Include="BallObject.h">
       <Filter>Header Files\AppObjects</Filter>
     </ClInclude>
-    <ClInclude Include="Configs.h">
-      <Filter>Header Files\AppObjects</Filter>
-    </ClInclude>
     <ClInclude Include="PaddleObject.h">
       <Filter>Header Files\AppObjects</Filter>
+    </ClInclude>
+    <ClInclude Include="Configs.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

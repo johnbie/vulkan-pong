@@ -27,4 +27,6 @@ private:
     
     GLFWwindow* window; // glfw window instance
     VulkanEngine* vulkanEngine; // glfw window instance
+
+    static void playBootMusic();
 };

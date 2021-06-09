@@ -18,6 +18,7 @@ protected:
     virtual void initialize();
     virtual void update();
     virtual void clean();
+    static int beep(int freq, int ms);
 private:
     bool _isAlive;
 };

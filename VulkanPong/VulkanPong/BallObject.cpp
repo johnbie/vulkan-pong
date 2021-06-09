@@ -1,7 +1,6 @@
 #pragma once
 #include "BallObject.h"
 
-
 BallObject::BallObject(Vertex* vertices, bool initialize) : RectangleObject(vertices, (PIXEL_WIDTH / 2) - 1, (PIXEL_HEIGHT / 2) - 1, 1, 1, initialize)
 {
 	//RectangleObject::update((PIXEL_WIDTH / 2) - 1, (PIXEL_HEIGHT / 2) - 1, 2, 2);
@@ -43,8 +42,16 @@ void BallObject::bounceBall()
 	bool endBounced = _goRight ? incrementHPos(-2) : incrementHPos(2);
 	
 	if (wallBounced)
+	{
+		std::thread BEEP(beep, 110, 100);
+		BEEP.detach();
 		_goUp = !_goUp;
+	}
 
 	if (endBounced)
+	{
+		std::thread BEEP(beep, 220, 100);
+		BEEP.detach();
 		_goRight = !_goRight;
-} 
+	}
+}

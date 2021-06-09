@@ -30,8 +30,22 @@ void PongApplication::Run()
     Clean(); // clean window and other objects
 }
 
+void PongApplication::playBootMusic()
+{
+    beep(55, 100);
+    beep(110, 100);
+    beep(220, 100);
+    beep(440, 100);
+    beep(880, 100);
+    beep(1760, 100);
+}
+
 void PongApplication::initialize()
 {
+    // play boot music
+    std::thread BEEP(playBootMusic);
+    BEEP.detach();
+
     // initialze the glfw instance
     glfwInit();
 
