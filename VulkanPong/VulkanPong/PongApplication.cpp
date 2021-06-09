@@ -77,6 +77,12 @@ void PongApplication::keyCallback(GLFWwindow* window, int key, int scancode, int
     {
         PongApplication::_p2DownHold = false;
     }
+    
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS && !PongApplication::_gameStart)
+    {
+        PongApplication::_gameStart = true;
+            beep(880, 300);
+    }
 }
 
 void PongApplication::initialize()
@@ -154,10 +160,15 @@ void PongApplication::update()
     if (_time != time)
     {
         _time = time;
+        
+        if (_gameStart)
+        {
+            // set positions and indices
+            p1->move(PongApplication::_p1UpHold, PongApplication::_p1DownHold);
+            p2->move(PongApplication::_p2UpHold, PongApplication::_p2DownHold);
+            ball->bounceBall();
+        }
 
-        // set positions and indices
-        p1->move(PongApplication::_p1UpHold, PongApplication::_p1DownHold);
-        p2->move(PongApplication::_p2UpHold, PongApplication::_p2DownHold);
         p1->Update();
         p2->Update();
         ball->Update();

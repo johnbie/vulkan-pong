@@ -26,6 +26,7 @@ private:
     PaddleObject* p2;
     BallObject* ball;
 
+    inline static bool _gameStart = false;
     inline static bool _p1UpHold = false;
     inline static bool _p1DownHold = false;
     inline static bool _p2UpHold = false;

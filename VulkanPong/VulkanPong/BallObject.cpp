@@ -4,6 +4,7 @@
 BallObject::BallObject(Vertex* vertices, bool initialize) : RectangleObject(vertices, (PIXEL_WIDTH / 2) - 1, (PIXEL_HEIGHT / 2) - 1, 1, 1, initialize)
 {
 	//RectangleObject::update((PIXEL_WIDTH / 2) - 1, (PIXEL_HEIGHT / 2) - 1, 2, 2);
+	_verticalVelocity = 0;
 	_goUp = false;
 	_goRight = false;
 };
@@ -15,7 +16,7 @@ void BallObject::initialize()
 
 void BallObject::update()
 {
-	bounceBall();
+	//bounceBall();
 	RectangleObject::update();
 }
 
