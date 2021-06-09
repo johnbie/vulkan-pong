@@ -100,18 +100,35 @@ bool RectangleObject::incrementVPos(int increment)
 
 void RectangleObject::updateVertices()
 {
-	float pixelWidth = (float)WIDTH / PIXEL_SIZE;
-	float pixelHeight = (float)HEIGHT / PIXEL_SIZE;
-	
-	_vertices[0].pos.x = (2.0f * _topLeftHPos / pixelWidth) - 1.0f;
-	_vertices[0].pos.y = (2.0f * _topLeftVPos / pixelHeight) - 1.0f;
+	if (_isVisible) 
+	{
+		float pixelWidth = (float)WIDTH / PIXEL_SIZE;
+		float pixelHeight = (float)HEIGHT / PIXEL_SIZE;
 
-	_vertices[1].pos.x = _vertices[0].pos.x + (2.0f * _width / pixelWidth);
-	_vertices[1].pos.y = _vertices[0].pos.y;
+		_vertices[0].pos.x = (2.0f * _topLeftHPos / pixelWidth) - 1.0f;
+		_vertices[0].pos.y = (2.0f * _topLeftVPos / pixelHeight) - 1.0f;
 
-	_vertices[2].pos.x = _vertices[1].pos.x;
-	_vertices[2].pos.y = _vertices[0].pos.y + (2.0f * _height / pixelHeight);
+		_vertices[1].pos.x = _vertices[0].pos.x + (2.0f * _width / pixelWidth);
+		_vertices[1].pos.y = _vertices[0].pos.y;
 
-	_vertices[3].pos.x = _vertices[0].pos.x;
-	_vertices[3].pos.y = _vertices[2].pos.y;
+		_vertices[2].pos.x = _vertices[1].pos.x;
+		_vertices[2].pos.y = _vertices[0].pos.y + (2.0f * _height / pixelHeight);
+
+		_vertices[3].pos.x = _vertices[0].pos.x;
+		_vertices[3].pos.y = _vertices[2].pos.y;
+	}
+	else
+	{
+		_vertices[0].pos.x = 0;
+		_vertices[0].pos.y = 0;
+
+		_vertices[1].pos.x = 0;
+		_vertices[1].pos.y = 0;
+
+		_vertices[2].pos.x = 0;
+		_vertices[2].pos.y = 0;
+
+		_vertices[3].pos.x = 0;
+		_vertices[3].pos.y = 0;
+	}
 }
