@@ -163,6 +163,7 @@
     <ClCompile Include="QueueFamilyIndices.h" />
     <ClCompile Include="RectangleObject.cpp" />
     <ClCompile Include="RectangleObject.h" />
+    <ClCompile Include="ScoreObject.cpp" />
     <ClCompile Include="VulkanEngine.cpp" />
     <ClCompile Include="VulkanEngineHelper.cpp" />
     <ClCompile Include="VulkanEngineHelper.h" />
@@ -175,6 +176,7 @@
     <ClInclude Include="PaddleObject.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PongApplication.h" />
+    <ClInclude Include="ScoreObject.h" />
     <ClInclude Include="SwapChainSupportDetails.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VulkanEngine.h" />

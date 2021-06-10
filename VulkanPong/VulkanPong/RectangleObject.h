@@ -5,14 +5,11 @@
 class RectangleObject : public AppObject
 {
 public:
+    RectangleObject(bool initialize = false);
     RectangleObject(Vertex* vertices, int topLeftHPos, int topLeftVPos, int width, int height, bool initialize = false);
 
-protected:
-    virtual void initialize();
-    virtual void update();
-    virtual void clean();
-
     void setVisible(bool isVisible);
+    void setVertices(Vertex* vertices);
     void update(int topLeftHPos, int topLeftVPos, int width, int height);
     void updatePos(int topLeftHPos, int topLeftVPos);
     void updateSize(int width, int height);
@@ -20,6 +17,12 @@ protected:
     void updateHeight(int height);
     bool incrementHPos(int offset);
     bool incrementVPos(int offset);
+
+protected:
+    virtual void initialize();
+    virtual void update();
+    virtual void clean();
+
 private:
     // pointer to top-left corner of dynamically allocated vertex, which can be treated like a dynamic array
     Vertex* _vertices;

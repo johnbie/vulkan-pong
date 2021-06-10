@@ -119,27 +119,30 @@ void PongApplication::initialize()
     p2 = new PaddleObject(vertices+4, false, true);
     ball = new BallObject(vertices+8, true);
 
-    // score text
-    new RectangleObject(vertices + 12, (PIXEL_WIDTH / 4) - 6, 4, 2, 8, true);
-    new RectangleObject(vertices + 16, (PIXEL_WIDTH / 4) - 6, 10, 2, 10, true);
-    new RectangleObject(vertices + 20, (PIXEL_WIDTH / 4) + 3, 4, 6, 2, true);
-    new RectangleObject(vertices + 24, (PIXEL_WIDTH / 4) + 3, 10, 6, 2, true);
-    new RectangleObject(vertices + 28, (PIXEL_WIDTH / 4) + 3, 18, 6, 2, true);
-    new RectangleObject(vertices + 32, (PIXEL_WIDTH / 4) + 3, 4, 2, 8, true);
-    new RectangleObject(vertices + 36, (PIXEL_WIDTH / 4) + 3, 10, 2, 10, true);
-    new RectangleObject(vertices + 40, (PIXEL_WIDTH / 4) + 7, 4, 2, 8, true);
-    new RectangleObject(vertices + 44, (PIXEL_WIDTH / 4) + 7, 10, 2, 10, true);
+    score = new ScoreObject(vertices + 12, true);
 
-    // score text
-    new RectangleObject(vertices + 48, (PIXEL_WIDTH / 4 * 3) - 6, 4, 2, 8, true);
-    new RectangleObject(vertices + 52, (PIXEL_WIDTH / 4 * 3) - 6, 10, 2, 10, true);
-    new RectangleObject(vertices + 56, (PIXEL_WIDTH / 4 * 3) + 3, 4, 6, 2, true);
-    new RectangleObject(vertices + 60, (PIXEL_WIDTH / 4 * 3) + 3, 10, 6, 2, true);
-    new RectangleObject(vertices + 64, (PIXEL_WIDTH / 4 * 3) + 3, 18, 6, 2, true);
-    new RectangleObject(vertices + 68, (PIXEL_WIDTH / 4 * 3) + 3, 4, 2, 8, true);
-    new RectangleObject(vertices + 72, (PIXEL_WIDTH / 4 * 3) + 3, 10, 2, 10, true);
-    new RectangleObject(vertices + 76, (PIXEL_WIDTH / 4 * 3) + 7, 4, 2, 8, true);
-    new RectangleObject(vertices + 80, (PIXEL_WIDTH / 4 * 3) + 7, 10, 2, 10, true);
+    //// score text
+    //new RectangleObject(vertices + 12, (PIXEL_WIDTH / 4) - 6, 4, 2, 8, true);
+    //new RectangleObject(vertices + 16, (PIXEL_WIDTH / 4) - 6, 10, 2, 10, true);
+    //new RectangleObject(vertices + 32, (PIXEL_WIDTH / 4) + 3, 4, 2, 8, true);
+    //new RectangleObject(vertices + 36, (PIXEL_WIDTH / 4) + 3, 10, 2, 10, true);
+    //new RectangleObject(vertices + 40, (PIXEL_WIDTH / 4) + 7, 4, 2, 8, true);
+    //new RectangleObject(vertices + 44, (PIXEL_WIDTH / 4) + 7, 10, 2, 10, true);
+    //new RectangleObject(vertices + 20, (PIXEL_WIDTH / 4) + 3, 4, 6, 2, true);
+    //new RectangleObject(vertices + 24, (PIXEL_WIDTH / 4) + 3, 10, 6, 2, true);
+    //new RectangleObject(vertices + 28, (PIXEL_WIDTH / 4) + 3, 18, 6, 2, true);
+    //
+    //// score text
+    //new RectangleObject(vertices + 48, (PIXEL_WIDTH / 4 * 3) - 6, 4, 2, 8, true);
+    //new RectangleObject(vertices + 52, (PIXEL_WIDTH / 4 * 3) - 6, 10, 2, 10, true);
+    //new RectangleObject(vertices + 56, (PIXEL_WIDTH / 4 * 3) + 3, 4, 6, 2, true);
+    //new RectangleObject(vertices + 60, (PIXEL_WIDTH / 4 * 3) + 3, 10, 6, 2, true);
+    //new RectangleObject(vertices + 64, (PIXEL_WIDTH / 4 * 3) + 3, 18, 6, 2, true);
+    //new RectangleObject(vertices + 68, (PIXEL_WIDTH / 4 * 3) + 3, 4, 2, 8, true);
+    //new RectangleObject(vertices + 72, (PIXEL_WIDTH / 4 * 3) + 3, 10, 2, 10, true);
+    //new RectangleObject(vertices + 76, (PIXEL_WIDTH / 4 * 3) + 7, 4, 2, 8, true);
+    //new RectangleObject(vertices + 80, (PIXEL_WIDTH / 4 * 3) + 7, 10, 2, 10, true);
+
     new RectangleObject(vertices + 84, PIXEL_WIDTH / 2, 0, 1, PIXEL_HEIGHT, true);
 
     // set up vulkan
@@ -166,7 +169,7 @@ void PongApplication::update()
             // set positions and indices
             p1->move(PongApplication::_p1UpHold, PongApplication::_p1DownHold);
             p2->move(PongApplication::_p2UpHold, PongApplication::_p2DownHold);
-            ball->bounceBall();
+            ball->moveBall();
         }
 
         p1->Update();

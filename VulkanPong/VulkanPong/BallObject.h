@@ -5,8 +5,9 @@ class BallObject : public RectangleObject
 {
 public:
     BallObject(Vertex* vertices, bool initialize = false);
-    void startMoving(bool goRight, int verticalVelocity);
-    void bounceBall();
+    void startBall(int verticalPos, bool goRight, int verticalVelocity);
+    void changeDirection(int verticalVelocity);
+    bool moveBall();
 
 protected:
     virtual void initialize();

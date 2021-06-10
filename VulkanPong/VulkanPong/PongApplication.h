@@ -1,8 +1,9 @@
 #pragma once
 #include "AppObject.h"
 #include "RectangleObject.h"
-#include "BallObject.h"
 #include "PaddleObject.h"
+#include "BallObject.h"
+#include "ScoreObject.h"
 #include "VulkanEngine.h"
 #include <functional>
 
@@ -25,6 +26,7 @@ private:
     PaddleObject* p1;
     PaddleObject* p2;
     BallObject* ball;
+    ScoreObject* score;
 
     inline static bool _gameStart = false;
     inline static bool _p1UpHold = false;

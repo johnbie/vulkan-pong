@@ -2,6 +2,16 @@
 #include "RectangleObject.h"
 
 
+RectangleObject::RectangleObject(bool initialize)
+{
+	_vertices = nullptr;
+	_topLeftHPos = 0;
+	_topLeftVPos = 0;
+	_width = 0;
+	_height = 0;
+	_isVisible = false;
+}
+
 RectangleObject::RectangleObject(Vertex* vertices, int topLeftHPos, int topLeftVPos, int width, int height, bool initialize)
 {
 	_vertices = vertices;
@@ -32,6 +42,12 @@ void RectangleObject::clean()
 void RectangleObject::setVisible(bool isVisible)
 {
 	_isVisible = isVisible;
+	updateVertices();
+}
+
+void RectangleObject::setVertices(Vertex* vertices)
+{
+	_vertices = vertices;
 }
 
 void RectangleObject::update(int topLeftHPos, int topLeftVPos, int width, int height)
@@ -40,28 +56,33 @@ void RectangleObject::update(int topLeftHPos, int topLeftVPos, int width, int he
 	_topLeftVPos = topLeftVPos;
 	_width = width;
 	_height = height;
+	updateVertices();
 }
 
 void RectangleObject::updatePos(int topLeftHPos, int topLeftVPos)
 {
 	_topLeftHPos = topLeftHPos;
 	_topLeftVPos = topLeftVPos;
+	updateVertices();
 }
 
 void RectangleObject::updateSize(int width, int height)
 {
 	_width = width;
 	_height = height;
+	updateVertices();
 }
 
 void RectangleObject::updateWidth(int width)
 {
 	_width = width;
+	updateVertices();
 }
 
 void RectangleObject::updateHeight(int height)
 {
 	_height = height;
+	updateVertices();
 }
 
 bool RectangleObject::incrementHPos(int increment)
@@ -71,14 +92,20 @@ bool RectangleObject::incrementHPos(int increment)
 	if (_topLeftHPos < 0)
 	{
 		_topLeftHPos = 0;
+		updateVertices();
 		return true;
 	}
 	else if (_topLeftHPos > (WIDTH / PIXEL_SIZE) - _width)
 	{
 		_topLeftHPos = (WIDTH / PIXEL_SIZE) - _width;
+		updateVertices();
 		return true;
 	}
-	else return false;
+	else
+	{
+		updateVertices();
+		return false;
+	}
 }
 
 bool RectangleObject::incrementVPos(int increment)
@@ -88,14 +115,20 @@ bool RectangleObject::incrementVPos(int increment)
 	if (_topLeftVPos < 0)
 	{
 		_topLeftVPos = 0;
+		updateVertices();
 		return true;
 	}
 	else if (_topLeftVPos > (HEIGHT / PIXEL_SIZE) - _height)
 	{
 		_topLeftVPos = (HEIGHT / PIXEL_SIZE) - _height;
+		updateVertices();
 		return true;
 	}
-	else return false;
+	else
+	{
+		updateVertices();
+		return false;
+	}
 }
 
 void RectangleObject::updateVertices()

@@ -25,7 +25,7 @@ void BallObject::clean()
 	RectangleObject::clean();
 }
 
-void BallObject::bounceBall()
+bool BallObject::moveBall()
 {
 	//bool bounced;
 	//if (_goUp)
@@ -51,8 +51,11 @@ void BallObject::bounceBall()
 
 	if (endBounced)
 	{
-		std::thread BEEP(beep, 220, 100);
+		std::thread BEEP(beep, 220, 100); // TODO: change sound to something scarier
 		BEEP.detach();
 		_goRight = !_goRight;
+
+		return true;
 	}
+	return false;
 }
