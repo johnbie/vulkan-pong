@@ -47,31 +47,12 @@ private:
     std::vector<VkCommandBuffer> commandBuffers; // the drawing command buffer
 
     std::vector<Vertex> vertices;
-    //std::vector<Vertex> vertices = {
-    //    {{-0.866666667f, -0.1f}},
-    //    {{-0.85f, -0.1f}},
-    //    {{-0.85f, 0.1f}},
-    //    {{-0.866666667f, 0.1f}},
-    //    {{0.85f, -0.1f}},
-    //    {{0.866666667f, -0.1f}},
-    //    {{0.866666667f, 0.1f}},
-    //    {{0.85f, 0.1f}},
-    //    {{-0.008333333f, -0.01f}},
-    //    {{0.008333333f, -0.01f}},
-    //    {{0.008333333f, 0.01f}},
-    //    {{-0.008333333f, 0.01f}}
-    //};
     std::vector<VkBuffer> vertexBuffers; // the vertex buffers
     std::vector<VkDeviceMemory> vertexBuffersMemory; // memory heap for storing vertex buffers
     //VkBuffer vertexBuffer; // the vertex buffer
     //VkDeviceMemory vertexBufferMemory; // memory heap for storing vertex information
 
     std::vector<uint16_t> indices;
-    //std::vector<uint16_t> indices = {
-    //    0, 1, 2, 2, 3, 0,
-    //    4, 5, 6, 6, 7, 4,
-    //    8, 9, 10, 10, 11, 8
-    //}; // non-global indices
     VkBuffer indexBuffer; // the index buffer
     VkDeviceMemory indexBufferMemory; // memory heap for storing index information
 
