@@ -93,7 +93,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ScoreObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\AppObjects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
